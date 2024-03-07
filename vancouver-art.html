@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Public Art Installations in Vancouver</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.js"></script>
+<style>
+body { margin: 0; padding: 0; }
+#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+
+.map-overlay {
+        position: absolute;
+        font-family: sans-serif;
+        margin-bottom: 40px;
+        margin-left: 5px;
+        padding: 5px;
+        width: 80%;
+        font-size: 16px;
+        color: #000000;
+      border-radius: 5px;
+      }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div class='map-overlay' id='features'><h2>Public Art Installations in the City of Vancouver</h2>
+    <div id='pd'><p>Data provided by City of Vancouver Open Data</p></div></div>
+<script>
+	mapboxgl.accessToken = 'pk.eyJ1IjoibXJvaHJ3YXNzZXIiLCJhIjoiY2x0NHFvbXI2MDV2ZzJqbnBkcXp4Z3lrZiJ9.yfXr9-rc4uRVk2M5IdU0RA';
+    const map = new mapboxgl.Map({
+        container: 'map', // container ID
+        style: 'mapbox://styles/mrohrwasser/clt50ifhf00d501pt3ne6fev6',
+        center: [-123.135, 49.260], // starting position
+        zoom: 11.6 // starting zoom
+    });
+
+    map.on('load', () => {
+        map.addSource('public-parks', {
+            type: 'vector',
+            url: 'mapbox://mrohrwasser.3uzz1yld'
+        });
+        map.addLayer(
+            {
+                'id': 'public-parks',
+                'type': 'fill',
+                'source': 'public-parks',
+                'source-layer': 'parks-polygon-representation-clrg16',
+                'paint': {
+                    'fill-color': '#1e8a22',
+                }
+            },
+        );
+          });
+
+    map.on('load', () => {
+        map.addSource('public-art', {
+            type: 'vector',
+            url: 'mapbox://mrohrwasser.8p2jetgk'
+        });
+        map.addLayer(
+            {
+                'id': 'public-art',
+                'type': 'circle',
+                'source': 'public-art',
+                'source-layer': 'public-art-4qxeo2',
+                'paint': {
+                    'circle-color': '#ff0000',
+                    'circle-radius': 3,
+                    'circle-stroke-color': '#000000',
+                    'circle-stroke-width': 1,
+                }
+            },
+        );
+      });
+
+      map.on('click', 'public-art', function (e) {
+    var features = map.queryRenderedFeatures(e.point, { layers: ['public-art'] });
+
+    if (!features.length) {
+      return;
+    }
+
+    var clickedPoint = features[0];
+
+    var popup = new mapboxgl.Popup()
+      .setLngLat(clickedPoint.geometry.coordinates)
+      .setHTML('<h2>' + clickedPoint.properties.sitename + '</h2><p>' + clickedPoint.properties.siteaddres + '<p>')
+      .addTo(map);
+  });
+
+map.on('mouseenter', 'public-art', function () {
+  map.getCanvas().style.cursor = 'pointer';
+});
+
+map.on('mouseleave', 'public-art', function () {
+  map.getCanvas().style.cursor = '';
+});
+
+
+</script>
+
+</body>
+</html>
